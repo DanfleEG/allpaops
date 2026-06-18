@@ -3,7 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { Clock, Calendar } from 'lucide-react';
 import { Login } from './pages/Login';
 import { Sidebar } from './components/Sidebar';
 import { Dashboard } from './pages/Dashboard';
@@ -16,6 +17,25 @@ import { Integraciones } from './pages/Integraciones';
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [currentTime, setCurrentTime] = useState(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const formattedTime = currentTime.toLocaleTimeString('es-ES', { 
+    hour: '2-digit', 
+    minute: '2-digit', 
+    second: '2-digit' 
+  });
+  
+  const formattedDate = currentTime.toLocaleDateString('es-ES', { 
+    weekday: 'short', 
+    year: 'numeric', 
+    month: 'short', 
+    day: 'numeric' 
+  });
 
   if (!isAuthenticated) {
     return <Login onLogin={() => setIsAuthenticated(true)} />;
@@ -54,7 +74,18 @@ export default function App() {
       <main className="flex-1 flex flex-col h-full shrink-0">
         <header className="h-16 border-b border-gray-200 bg-white flex items-center justify-between px-8 shrink-0">
           <h2 className="text-lg font-semibold text-gray-800 capitalize">{activeTab.replace('-', ' ')}</h2>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-6">
+            <div className="flex items-center gap-4 text-sm text-gray-600 bg-gray-50 px-4 py-1.5 rounded-lg border border-gray-100 hidden sm:flex">
+              <div className="flex items-center gap-2">
+                <Calendar size={14} className="text-[#556b2f]" />
+                <span className="capitalize">{formattedDate}</span>
+              </div>
+              <div className="w-px h-4 bg-gray-200" />
+              <div className="flex items-center gap-2 font-mono">
+                <Clock size={14} className="text-[#556b2f]" />
+                <span>{formattedTime}</span>
+              </div>
+            </div>
             <span className="text-sm text-gray-500">Sincronización: <strong>Hace 12s</strong></span>
           </div>
         </header>
