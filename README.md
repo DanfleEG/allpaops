@@ -1,20 +1,50 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
-</div>
+# AllpaOps
 
-# Run and deploy your AI Studio app
+AllpaOps is an agricultural operations dashboard tailored for monitoring, tracking, and managing fieldwork in real-time. It provides a comprehensive suite of tools designed to streamline farming processes, ensure traceability, and optimize resource allocation.
 
-This contains everything you need to run your app locally.
+## Core Modules
 
-View your app in AI Studio: https://ai.studio/apps/f528aab6-7f12-40bd-8ded-35770cc43cc9
+*   **Dashboard:** Real-time overview of your agricultural operations, key metrics, and daily activities.
+*   **Tareo (Timekeeping):** Track worker assistance, labor hours, and specific task assignments across different fields.
+*   **Sanidad (Phytosanitary Health):** Monitor crop health, pest control activities, and pesticide applications.
+*   **Mapa de Lotes (Field GIS):** Visual representation of your fields and lots with interactive mapping features.
+*   **Trazabilidad (Traceability):** End-to-end tracking of produce from the field to delivery, ensuring compliance and quality control.
+*   **Integraciones:** Centralized hub for configuring third-party integrations.
 
-## Run Locally
+## Integrations
 
-**Prerequisites:**  Node.js
+AllpaOps supports seamless data flow with a wide ecosystem of services and databases:
 
+*   **Databases:** PostgreSQL, Supabase, Redis
+*   **AI & Agents:** Model Context Protocol (MCP) integrations
+*   **Communications:** WhatsApp Business API, Telegram Bots, SMS alerts
+*   **Automation:** n8n, Zapier, Slack
+*   **External Systems:** Connects with external ERPs for bidirectional syncing.
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+## Tech Stack
+
+*   **Framework:** React 18 with Vite
+*   **Language:** TypeScript
+*   **Styling:** Tailwind CSS
+*   **Icons:** Lucide React
+
+## Getting Started
+
+1.  **Install dependencies:**
+    ```bash
+    npm install
+    ```
+
+2.  **Start the development server:**
+    ```bash
+    npm run dev
+    ```
+
+3.  **Build for production:**
+    ```bash
+    npm run build
+    ```
+
+## License
+
+This project is licensed under Apache-2.0.
