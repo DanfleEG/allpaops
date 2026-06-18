@@ -1,0 +1,6 @@
+{
+  "name": "AllpaOps",
+  "description": "Sistema de Orquestación Operativa Agrícola con visualización de tareo, auditoría, mapas de lotes y más.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
