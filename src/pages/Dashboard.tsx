@@ -1,5 +1,5 @@
 import React from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, AreaChart, Area } from 'recharts';
 
 export function Dashboard({ totalJabasHoy = 1942 }: { totalJabasHoy?: number }) {
   const kpis = [
@@ -23,7 +23,7 @@ export function Dashboard({ totalJabasHoy = 1942 }: { totalJabasHoy?: number }) 
     { name: 'Uva', value: 29 },
   ];
 
-  const COLORS = ['#556b2f', '#819835', '#b5c873'];
+  const COLORS = ['#D4A017', '#5B5FCF', '#8E44AD'];
 
   const dataEvolucion = [
     { dia: 'Lun', jabas: 1200 },
@@ -65,11 +65,17 @@ export function Dashboard({ totalJabasHoy = 1942 }: { totalJabasHoy?: number }) 
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={dataTrabajadores} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="colorRanking" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#22C55E" stopOpacity={1}/>
+                    <stop offset="95%" stopColor="#14532D" stopOpacity={1}/>
+                  </linearGradient>
+                </defs>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
                 <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#78716c' }} />
                 <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#78716c' }} />
                 <Tooltip cursor={{ fill: '#f5f5f4' }} contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
-                <Bar dataKey="jabas" fill="#556b2f" radius={[4, 4, 0, 0]} maxBarSize={40} />
+                <Bar dataKey="jabas" fill="url(#colorRanking)" radius={[4, 4, 0, 0]} maxBarSize={40} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -116,13 +122,19 @@ export function Dashboard({ totalJabasHoy = 1942 }: { totalJabasHoy?: number }) 
           <h3 className="font-bold text-gray-700 mb-4">Evolución Semanal de Cosecha</h3>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={dataEvolucion} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+              <AreaChart data={dataEvolucion} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="colorArea" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#0D9488" stopOpacity={0.4}/>
+                    <stop offset="95%" stopColor="#0D9488" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
                 <XAxis dataKey="dia" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#78716c' }} />
                 <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#78716c' }} />
                 <Tooltip cursor={{ stroke: '#d6d3d1' }} contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
-                <Line type="monotone" dataKey="jabas" stroke="#556b2f" strokeWidth={3} dot={{ r: 4, fill: '#556b2f', strokeWidth: 0 }} activeDot={{ r: 6 }} />
-              </LineChart>
+                <Area type="monotone" dataKey="jabas" stroke="#0D9488" strokeWidth={3} fillOpacity={1} fill="url(#colorArea)" activeDot={{ r: 6 }} />
+              </AreaChart>
             </ResponsiveContainer>
           </div>
         </div>
@@ -137,7 +149,7 @@ export function Dashboard({ totalJabasHoy = 1942 }: { totalJabasHoy?: number }) 
                 <XAxis dataKey="lote" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#78716c' }} />
                 <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#78716c' }} />
                 <Tooltip cursor={{ fill: '#f5f5f4' }} contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
-                <Bar dataKey="rto" fill="#819835" radius={[4, 4, 0, 0]} maxBarSize={40} />
+                <Bar dataKey="rto" fill="#A0522D" radius={[4, 4, 0, 0]} maxBarSize={40} />
               </BarChart>
             </ResponsiveContainer>
           </div>
