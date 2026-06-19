@@ -61,7 +61,8 @@ export function Tareo({ setTotalJabasHoy }: any) {
       const { data, error } = await supabase
         .from('tareo_registros')
         .select('*, trabajadores(nombre), lotes(codigo)')
-        .order('hora_registro', { ascending: false });
+        .order('hora_registro', { ascending: false })
+        .limit(10);
 
       if (error) {
         throw error;

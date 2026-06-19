@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
 import { FileText, Loader2, CheckCircle2, Download, ShieldCheck } from 'lucide-react';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import { LOTES } from '../data';
 
 export function Trazabilidad() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [step, setStep] = useState(0);
   const [showReport, setShowReport] = useState(false);
+  const [reportId, setReportId] = useState('');
 
   const steps = [
     "Iniciando...",
@@ -18,6 +21,7 @@ export function Trazabilidad() {
     setIsGenerating(true);
     setShowReport(false);
     setStep(1);
+    setReportId(`AUD-${new Date().getTime().toString().slice(-6)}`);
 
     setTimeout(() => setStep(2), 800);
     setTimeout(() => setStep(3), 1600);
@@ -26,6 +30,51 @@ export function Trazabilidad() {
       setShowReport(true);
       setStep(0);
     }, 2500);
+  };
+
+  const handleDownloadPDF = () => {
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+    
+    // Título Central
+    doc.setFontSize(16);
+    doc.setFont("helvetica", "bold");
+    doc.text("ALLPAOPS — CERTIFICADO DE TRAZABILIDAD", pageWidth / 2, 20, { align: "center" });
+    
+    // ID y Fecha
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    const dateStr = new Date().toLocaleDateString();
+    doc.text(`ID del Reporte: ${reportId}`, 14, 30);
+    doc.text(`Fecha: ${dateStr}`, 14, 35);
+    
+    // Metrics
+    autoTable(doc, {
+      startY: 45,
+      head: [['Período', 'Lotes Auditados', 'Registros Consolidados', 'Cumplimiento']],
+      body: [
+        [`1-14 ${new Date().toLocaleString('es', { month: 'short' })}`, '10 / 10', '3,492', '100%']
+      ],
+      theme: 'grid',
+      headStyles: { fillColor: [16, 185, 129] } // emerald green
+    });
+
+    // Lotes Table
+    const lotesBody = LOTES.map(lote => [
+      lote.nombre,
+      lote.cultivo,
+      lote.estado + (lote.estado === 'En Carencia Activa' ? ` (Carencia: ${lote.carencia}d)` : '')
+    ]);
+
+    autoTable(doc, {
+      startY: (doc as any).lastAutoTable.finalY + 15,
+      head: [['Lote', 'Cultivo', 'Estado de Inocuidad']],
+      body: lotesBody,
+      theme: 'striped',
+      headStyles: { fillColor: [75, 85, 99] } 
+    });
+
+    doc.save(`AllpaOps_Certificado_Trazabilidad_${reportId}.pdf`);
   };
 
   return (
@@ -96,9 +145,12 @@ export function Trazabilidad() {
                 <CheckCircle2 className="text-green-600" size={20}/>
                 Reporte Generado Exitosamente
               </h3>
-              <p className="text-sm font-mono text-gray-500 mt-1">ID: AUD-{new Date().getTime().toString().slice(-6)} • {new Date().toLocaleDateString()}</p>
+              <p className="text-sm font-mono text-gray-500 mt-1">ID: {reportId} • {new Date().toLocaleDateString()}</p>
             </div>
-            <button className="flex items-center gap-2 bg-white border border-gray-200 hover:bg-gray-50 px-4 py-2 rounded-lg text-sm font-medium text-gray-700 shadow-sm transition-colors">
+            <button 
+              onClick={handleDownloadPDF}
+              className="flex items-center gap-2 bg-white border border-gray-200 hover:bg-gray-50 px-4 py-2 rounded-lg text-sm font-medium text-gray-700 shadow-sm transition-colors"
+            >
               <Download size={16} />
               Descargar PDF
             </button>
@@ -128,7 +180,8 @@ export function Trazabilidad() {
                 </div>
                 <div className="border border-gray-100 rounded-lg p-4 bg-gray-50/50">
                   <p className="text-xs text-gray-500 mb-1 uppercase tracking-wider font-semibold">Cumplimiento</p>
-                  <p className="font-mono text-sm text-green-700 font-bold">100%</p>
+                  <p className="font-mono text-sm text-[#10B981] font-bold">100%</p>
+                  <p className="text-[10px] text-gray-400 mt-1 leading-tight border-t border-gray-100 pt-1">de lotes cosechados</p>
                 </div>
               </div>
 
@@ -143,10 +196,10 @@ export function Trazabilidad() {
                         <span className="text-red-600 border border-red-200 bg-red-50 px-2 py-0.5 rounded text-xs">Carencia: {lote.carencia}d</span>
                       )}
                       {lote.estado === 'Listo para Cosecha' && (
-                        <span className="text-[#059669] border border-[#D1FAE5] bg-[#D1FAE5]/30 px-2 py-0.5 rounded text-xs">Listo para Cosecha</span>
+                        <span className="text-[#10B981] border border-[#10B981]/50 bg-[#D1FAE5] px-2 py-0.5 rounded text-xs">Listo para Cosecha</span>
                       )}
                       {lote.estado === 'Cosechado Seguro' && (
-                        <span className="text-blue-600 border border-blue-200 bg-blue-50 px-2 py-0.5 rounded text-xs">Cosechado Seguro</span>
+                        <span className="text-[#10B981] border border-[#10B981]/50 bg-[#D1FAE5] px-2 py-0.5 rounded text-xs">Cosechado Seguro</span>
                       )}
                     </div>
                   ))}
