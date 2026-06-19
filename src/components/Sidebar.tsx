@@ -10,7 +10,10 @@ import {
   LogOut,
   ChevronLeft,
   ChevronRight,
-  Tag
+  Tag,
+  Globe,
+  Github,
+  Linkedin
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -97,29 +100,60 @@ export function Sidebar({ activeTab, setActiveTab, onLogout }: SidebarProps) {
 
       <div className="p-6 border-t border-white/10 mt-auto">
         {!collapsed && (
-          <div className="flex items-center justify-between gap-3 mb-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-[#10B981]/20 rounded-full flex items-center justify-center text-[#059669] font-bold">JD</div>
-              <div className="text-left">
-                <p className="text-sm font-medium">Gerencia</p>
-                <p className="text-xs text-gray-500">AllpaOps</p>
+          <div className="flex flex-col gap-6">
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-[#10B981]/20 rounded-full flex items-center justify-center text-[#059669] font-bold">JD</div>
+                <div className="text-left">
+                  <p className="text-sm font-medium">Gerencia</p>
+                  <p className="text-xs text-gray-500">AllpaOps</p>
+                </div>
+              </div>
+              <button
+                onClick={onLogout}
+                className="text-gray-400 hover:text-white transition-colors"
+                title="Cerrar Sesión"
+              >
+                <LogOut size={16} />
+              </button>
+            </div>
+            
+            <div className="flex flex-col items-center gap-4 border-t border-white/5 pt-6 mt-2">
+              <p className="text-[11px] text-gray-500 font-medium text-center">© 2026 Danflylabs. Todos los derechos reservados.</p>
+              <div className="flex items-center justify-center gap-4">
+                <a href="https://porfolio.danflylab.space/" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-[#10B981] transition-colors" title="Portafolio web">
+                  <Globe size={22} />
+                </a>
+                <a href="https://github.com/DanfleEG" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-[#10B981] transition-colors" title="GitHub">
+                  <Github size={22} />
+                </a>
+                <a href="https://www.linkedin.com/in/danilo-estrella-guerra-9b26a92a5/" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-[#10B981] transition-colors" title="LinkedIn">
+                  <Linkedin size={22} />
+                </a>
               </div>
             </div>
-            <button
-              onClick={onLogout}
-              className="text-gray-400 hover:text-white transition-colors"
-              title="Cerrar Sesión"
-            >
-              <LogOut size={16} />
-            </button>
           </div>
         )}
         {collapsed && (
-          <div className="flex flex-col items-center gap-4">
-            <div className="w-10 h-10 bg-[#10B981]/20 rounded-full flex items-center justify-center text-[#059669] font-bold text-sm">JD</div>
-            <button onClick={onLogout} className="text-gray-400 hover:text-white" title="Cerrar Sesión">
-               <LogOut size={20} />
-            </button>
+          <div className="flex flex-col items-center gap-8">
+            <div className="flex flex-col items-center gap-4">
+              <div className="w-10 h-10 bg-[#10B981]/20 rounded-full flex items-center justify-center text-[#059669] font-bold text-sm">JD</div>
+              <button onClick={onLogout} className="text-gray-400 hover:text-white" title="Cerrar Sesión">
+                 <LogOut size={20} />
+              </button>
+            </div>
+            
+            <div className="flex flex-col items-center gap-4 border-t border-white/5 pt-6">
+              <a href="https://porfolio.danflylab.space/" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-[#10B981] transition-colors" title="Portafolio web">
+                <Globe size={22} />
+              </a>
+              <a href="https://github.com/DanfleEG" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-[#10B981] transition-colors" title="GitHub">
+                <Github size={22} />
+              </a>
+              <a href="https://www.linkedin.com/in/danilo-estrella-guerra-9b26a92a5/" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-[#10B981] transition-colors" title="LinkedIn">
+                <Linkedin size={22} />
+              </a>
+            </div>
           </div>
         )}
       </div>
