@@ -48,7 +48,7 @@ export default function App() {
   const renderContent = () => {
     switch (activeTab) {
       case 'dashboard':
-        return <Dashboard totalJabasHoy={totalJabasHoy} />;
+        return <Dashboard />;
       case 'tareo':
         return <Tareo 
           registros={registrosTareo} 
@@ -66,7 +66,7 @@ export default function App() {
       case 'precios':
         return <Precios />;
       default:
-        return <Dashboard totalJabasHoy={totalJabasHoy} />;
+        return <Dashboard />;
     }
   };
 
