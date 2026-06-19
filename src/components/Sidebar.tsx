@@ -9,7 +9,8 @@ import {
   Menu,
   LogOut,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Tag
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -25,6 +26,7 @@ const TABS = [
   { id: 'trazabilidad', label: 'Trazabilidad', icon: ShieldCheck },
   { id: 'mapa', label: 'Mapa de Lotes', icon: MapIcon },
   { id: 'integraciones', label: 'Integraciones', icon: Blocks },
+  { id: 'precios', label: 'Planes y Precios', icon: Tag },
 ];
 
 export function Sidebar({ activeTab, setActiveTab, onLogout }: SidebarProps) {
@@ -82,7 +84,7 @@ export function Sidebar({ activeTab, setActiveTab, onLogout }: SidebarProps) {
               title={collapsed ? tab.label : undefined}
               className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors cursor-pointer ${
                 isActive 
-                  ? 'bg-[#556b2f] text-white font-medium' 
+                  ? 'bg-[#10B981] text-white font-medium' 
                   : 'text-gray-400 hover:bg-white/5'
               } ${collapsed ? 'justify-center' : 'justify-start'}`}
             >
@@ -97,7 +99,7 @@ export function Sidebar({ activeTab, setActiveTab, onLogout }: SidebarProps) {
         {!collapsed && (
           <div className="flex items-center justify-between gap-3 mb-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-[#556b2f]/20 rounded-full flex items-center justify-center text-[#8da46c] font-bold">JD</div>
+              <div className="w-10 h-10 bg-[#10B981]/20 rounded-full flex items-center justify-center text-[#059669] font-bold">JD</div>
               <div className="text-left">
                 <p className="text-sm font-medium">Gerencia</p>
                 <p className="text-xs text-gray-500">AllpaOps</p>
@@ -114,7 +116,7 @@ export function Sidebar({ activeTab, setActiveTab, onLogout }: SidebarProps) {
         )}
         {collapsed && (
           <div className="flex flex-col items-center gap-4">
-            <div className="w-10 h-10 bg-[#556b2f]/20 rounded-full flex items-center justify-center text-[#8da46c] font-bold text-sm">JD</div>
+            <div className="w-10 h-10 bg-[#10B981]/20 rounded-full flex items-center justify-center text-[#059669] font-bold text-sm">JD</div>
             <button onClick={onLogout} className="text-gray-400 hover:text-white" title="Cerrar Sesión">
                <LogOut size={20} />
             </button>

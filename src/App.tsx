@@ -13,6 +13,7 @@ import { Sanidad } from './pages/Sanidad';
 import { Trazabilidad } from './pages/Trazabilidad';
 import { MapaLotes } from './pages/MapaLotes';
 import { Integraciones } from './pages/Integraciones';
+import { Precios } from './pages/Precios';
 
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -62,13 +63,15 @@ export default function App() {
         return <MapaLotes />;
       case 'integraciones':
         return <Integraciones />;
+      case 'precios':
+        return <Precios />;
       default:
         return <Dashboard totalJabasHoy={totalJabasHoy} />;
     }
   };
 
   return (
-    <div className="flex h-screen bg-[#fafaf9] overflow-hidden text-[#1a1a1a] selection:bg-[#556b2f]/20">
+    <div className="flex h-screen bg-[#fafaf9] overflow-hidden text-[#1a1a1a] selection:bg-[#10B981]/20">
       <Sidebar 
         activeTab={activeTab} 
         setActiveTab={setActiveTab} 
@@ -84,12 +87,12 @@ export default function App() {
           <div className="flex items-center gap-6">
             <div className="flex items-center gap-4 text-sm text-gray-600 bg-gray-50 px-4 py-1.5 rounded-lg border border-gray-100 hidden sm:flex">
               <div className="flex items-center gap-2">
-                <Calendar size={14} className="text-[#556b2f]" />
+                <Calendar size={14} className="text-[#10B981]" />
                 <span className="capitalize">{formattedDate}</span>
               </div>
               <div className="w-px h-4 bg-gray-200" />
               <div className="flex items-center gap-2 font-mono">
-                <Clock size={14} className="text-[#556b2f]" />
+                <Clock size={14} className="text-[#10B981]" />
                 <span>{formattedTime}</span>
               </div>
             </div>

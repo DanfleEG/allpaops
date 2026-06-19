@@ -46,7 +46,7 @@ function SupabaseConnectionTest({ onSuccess }: { onSuccess: () => void }) {
           value={url}
           onChange={(e) => setUrl(e.target.value)}
           placeholder="https://tu-proyecto.supabase.co"
-          className="w-full border border-gray-200 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#556b2f]/50 focus:border-[#556b2f] text-sm"
+          className="w-full border border-gray-200 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#10B981]/50 focus:border-[#10B981] text-sm"
         />
       </div>
       <div>
@@ -57,7 +57,7 @@ function SupabaseConnectionTest({ onSuccess }: { onSuccess: () => void }) {
             value={key}
             onChange={(e) => setKey(e.target.value)}
             placeholder="eyJ..."
-            className="w-full border border-gray-200 rounded-lg pl-3 pr-10 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#556b2f]/50 focus:border-[#556b2f] text-sm"
+            className="w-full border border-gray-200 rounded-lg pl-3 pr-10 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#10B981]/50 focus:border-[#10B981] text-sm"
           />
           <button 
             type="button"
@@ -75,7 +75,7 @@ function SupabaseConnectionTest({ onSuccess }: { onSuccess: () => void }) {
         className={`w-full font-medium py-2 px-4 rounded-lg transition-colors text-sm ${
           status === 'loading' || !url || !key
             ? 'bg-gray-300 text-gray-500 cursor-not-allowed opacity-70'
-            : 'bg-[#556b2f] hover:bg-[#556b2f]/90 text-white'
+            : 'bg-[#10B981] hover:bg-[#059669] text-white'
         }`}
       >
         {status === 'loading' ? 'Probando...' : 'Probar Conexión'}
@@ -139,7 +139,7 @@ export function Integraciones() {
       return (
         <div className="space-y-4 font-mono text-sm">
            <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 text-gray-600">
-             <p className="text-[#556b2f] font-bold mb-2">// Server Name: AllpaOps Agent Toolkit</p>
+             <p className="text-[#10B981] font-bold mb-2">// Server Name: AllpaOps Agent Toolkit</p>
              <p>URL: https://mcp.allpaops.com/v1</p>
              <p>Capabilities: read_harvest, check_rules</p>
            </div>
@@ -265,7 +265,7 @@ export function Integraciones() {
 
       <div className="mb-10">
         <h3 className="text-lg font-bold text-gray-800 mb-6 flex items-center gap-2 border-b border-gray-100 pb-2">
-          <Database size={20} className="text-[#556b2f]" />
+          <Database size={20} className="text-[#10B981]" />
           Bases de Datos
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -345,7 +345,7 @@ export function Integraciones() {
 
       <div className="mb-10">
         <h3 className="text-lg font-bold text-gray-800 mb-6 flex items-center gap-2 border-b border-gray-100 pb-2">
-          <Network size={20} className="text-[#556b2f]" />
+          <Network size={20} className="text-[#10B981]" />
           Model Context Protocol (MCP)
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -385,7 +385,7 @@ export function Integraciones() {
 
       <div className="mb-12">
         <h3 className="text-lg font-bold text-gray-800 mb-6 flex items-center gap-2 border-b border-gray-100 pb-2">
-          <MessageCircle size={20} className="text-[#556b2f]" />
+          <MessageCircle size={20} className="text-[#10B981]" />
           Comunicaciones y Redes Sociales
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -445,7 +445,7 @@ export function Integraciones() {
 
       <div className="mb-12">
         <h3 className="text-lg font-bold text-gray-800 mb-6 flex items-center gap-2 border-b border-gray-100 pb-2">
-          <Workflow size={20} className="text-[#556b2f]" />
+          <Workflow size={20} className="text-[#10B981]" />
           Herramientas de Automatización
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -503,22 +503,22 @@ export function Integraciones() {
 
       <div>
         <h3 className="text-lg font-bold text-gray-800 mb-6 flex items-center gap-2 border-b border-gray-100 pb-2">
-          <Building2 size={20} className="text-[#556b2f]" />
+          <Building2 size={20} className="text-[#10B981]" />
           Sincronización con ERPs Agrotech
         </h3>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
           {ERPS.map(erp => (
-            <div key={erp.id} className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm flex flex-col items-center text-center justify-between min-h-[160px] group hover:border-[#556b2f]/30 transition-colors">
+            <div key={erp.id} className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm flex flex-col items-center text-center justify-between min-h-[160px] group hover:border-[#10B981]/30 transition-colors">
               <div className="flex-1 flex items-center justify-center">
                  {/* Placeholders, if real logos were provided they would go here */}
                  <div className="flex flex-col items-center">
-                   <Building2 size={28} className="text-gray-300 mb-3 group-hover:text-[#556b2f] transition-colors" />
+                   <Building2 size={28} className="text-gray-300 mb-3 group-hover:text-[#10B981] transition-colors" />
                    <span className="font-medium tracking-tight text-gray-800">{erp.name}</span>
                  </div>
               </div>
               <button 
                 onClick={() => setModal({ title: `Conexión a ${erp.name}`, type: 'erp', name: erp.name })}
-                className="w-full mt-4 bg-white border border-gray-200 text-gray-600 font-medium py-1.5 rounded-lg text-xs hover:bg-[#556b2f] hover:text-white hover:border-[#556b2f] transition-colors"
+                className="w-full mt-4 bg-white border border-gray-200 text-gray-600 font-medium py-1.5 rounded-lg text-xs hover:bg-[#059669] hover:text-white hover:border-[#10B981] transition-colors"
                >
                 Conectar
               </button>

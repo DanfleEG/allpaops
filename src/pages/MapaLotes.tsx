@@ -16,7 +16,7 @@ export function MapaLotes() {
             <span className="text-gray-600 font-medium">En Carencia Activa</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded bg-green-100 border border-green-200"></div>
+            <div className="w-4 h-4 rounded bg-[#D1FAE5] border border-[#10B981]/50"></div>
             <span className="text-gray-600 font-medium">Listo para Cosecha</span>
           </div>
           <div className="flex items-center gap-2">
@@ -38,7 +38,7 @@ export function MapaLotes() {
                     ? 'bg-red-50/30 border-red-200 hover:border-red-300' 
                     : lote.estado === 'Cosechado Seguro'
                     ? 'bg-blue-50/50 border-blue-200 hover:border-blue-300'
-                    : 'bg-green-50/50 border-green-200 hover:border-green-300'}
+                    : 'bg-[#D1FAE5]/30 border-[#D1FAE5] hover:border-[#10B981]/50'}
                 `}
               >
                 {/* Patrón de líneas sutil imitando surcos de campo */}

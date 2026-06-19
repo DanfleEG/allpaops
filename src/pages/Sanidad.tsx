@@ -39,7 +39,7 @@ export function Sanidad() {
                     <span className="text-[10px] bg-red-200 text-red-800 px-2 py-0.5 rounded font-bold uppercase">En Carencia Activa</span>
                   )}
                   {lote.estado === 'Listo para Cosecha' && (
-                    <span className="text-[10px] bg-green-200 text-green-800 px-2 py-0.5 rounded font-bold uppercase">Listo para Cosecha</span>
+                    <span className="text-[10px] bg-[#D1FAE5] text-[#059669] px-2 py-0.5 rounded font-bold uppercase">Listo para Cosecha</span>
                   )}
                   {lote.estado === 'Cosechado Seguro' && (
                     <span className="text-[10px] bg-blue-100 text-blue-800 px-2 py-0.5 rounded font-bold uppercase">Cosechado Seguro</span>

@@ -50,7 +50,7 @@ export function Trazabilidad() {
               
               <button
                 onClick={handleGenerate}
-                className="bg-[#556b2f] hover:bg-[#556b2f]/90 text-white px-6 py-3 rounded-xl font-medium flex items-center gap-2 shadow-sm transition-all"
+                className="bg-[#10B981] hover:bg-[#059669] text-white px-6 py-3 rounded-xl font-medium flex items-center gap-2 shadow-sm transition-all"
               >
                 <FileText size={20} />
                 Generar Reporte de Auditoría
@@ -69,7 +69,7 @@ export function Trazabilidad() {
                     <div 
                       key={idx} 
                       className={`flex items-center gap-3 text-sm transition-all duration-300 ${
-                        isActive ? 'text-[#556b2f] font-medium' : 
+                        isActive ? 'text-[#10B981] font-medium' : 
                         isPast ? 'text-gray-400' : 'text-gray-300'
                       }`}
                     >
@@ -143,7 +143,7 @@ export function Trazabilidad() {
                         <span className="text-red-600 border border-red-200 bg-red-50 px-2 py-0.5 rounded text-xs">Carencia: {lote.carencia}d</span>
                       )}
                       {lote.estado === 'Listo para Cosecha' && (
-                        <span className="text-green-600 border border-green-200 bg-green-50 px-2 py-0.5 rounded text-xs">Listo para Cosecha</span>
+                        <span className="text-[#059669] border border-[#D1FAE5] bg-[#D1FAE5]/30 px-2 py-0.5 rounded text-xs">Listo para Cosecha</span>
                       )}
                       {lote.estado === 'Cosechado Seguro' && (
                         <span className="text-blue-600 border border-blue-200 bg-blue-50 px-2 py-0.5 rounded text-xs">Cosechado Seguro</span>

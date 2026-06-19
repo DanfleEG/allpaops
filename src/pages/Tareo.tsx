@@ -183,7 +183,7 @@ export function Tareo({ setTotalJabasHoy }: any) {
                 type="text"
                 value={dni}
                 onChange={(e) => setDni(e.target.value.replace(/\D/g, ''))}
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#556b2f]/50 focus:border-[#556b2f] text-sm"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#10B981]/50 focus:border-[#10B981] text-sm"
                 placeholder="Ej: 45218976"
                 maxLength={8}
               />
@@ -211,7 +211,7 @@ export function Tareo({ setTotalJabasHoy }: any) {
               <select
                 value={lote}
                 onChange={(e) => setLote(e.target.value)}
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#556b2f]/50 focus:border-[#556b2f] text-sm"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#10B981]/50 focus:border-[#10B981] text-sm"
               >
                 {LOTES.map(l => <option key={l} value={l}>{l}</option>)}
               </select>
@@ -222,7 +222,7 @@ export function Tareo({ setTotalJabasHoy }: any) {
               <select
                 value={actividad}
                 onChange={(e) => setActividad(e.target.value)}
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#556b2f]/50 focus:border-[#556b2f] text-sm"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#10B981]/50 focus:border-[#10B981] text-sm"
               >
                 {ACTIVIDADES.map(a => <option key={a} value={a}>{a}</option>)}
               </select>
@@ -235,7 +235,7 @@ export function Tareo({ setTotalJabasHoy }: any) {
                   type="number"
                   value={cantidad}
                   onChange={(e) => setCantidad(e.target.value)}
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#556b2f]/50 focus:border-[#556b2f] font-mono text-sm"
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#10B981]/50 focus:border-[#10B981] font-mono text-sm"
                   placeholder="Ej: 45"
                 />
               </div>
@@ -248,7 +248,7 @@ export function Tareo({ setTotalJabasHoy }: any) {
               <select
                 value={modalidad}
                 onChange={(e) => setModalidad(e.target.value)}
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#556b2f]/50 focus:border-[#556b2f] text-sm"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#10B981]/50 focus:border-[#10B981] text-sm"
               >
                 {MODALIDADES.map(m => <option key={m} value={m}>{m}</option>)}
               </select>
@@ -278,7 +278,7 @@ export function Tareo({ setTotalJabasHoy }: any) {
               className={`font-medium py-2 px-6 rounded-lg transition-colors text-sm ${
                 isBlocked || isSubmitting || !trabajadorId
                   ? 'bg-gray-300 text-gray-500 cursor-not-allowed opacity-70' 
-                  : 'bg-[#556b2f] hover:bg-[#556b2f]/90 text-white'
+                  : 'bg-[#10B981] hover:bg-[#059669] text-white'
               }`}
             >
               {isSubmitting ? 'Registrando...' : 'Registrar Tareo'}
