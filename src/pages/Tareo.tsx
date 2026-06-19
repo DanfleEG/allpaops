@@ -1,188 +1,164 @@
 import React, { useState } from 'react';
-import { Download, Plus } from 'lucide-react';
-import { TRABAJADORES, LOTES, Lote, RegistroCosecha } from '../data';
+
+const TRABAJADORES = ['Ana Lucía', 'Luis Alberto', 'Carlos E.', 'María Elena', 'Jorge Antonio'];
+const LOTES = ['A1', 'A2', 'A3', 'B1', 'B2', 'B3', 'C1', 'C2', 'C3', 'C4'];
+const ACTIVIDADES = ['Cosecha', 'Poda', 'Fumigación', 'Riego', 'Deshierbe'];
+const MODALIDADES = ['Destajo', 'Jornal'];
+
+const CARENCIA_POR_LOTE: Record<string, number | null> = {
+  'A1': 11,
+  'A2': 9,
+  'A3': null,
+  'B1': 16,
+  'B2': null,
+  'B3': null,
+  'C1': 5,
+  'C2': null,
+  'C3': 10,
+  'C4': null,
+};
+
+const INITIAL_REGISTERS = [
+  { id: 1, hora: '07:15', trabajador: 'Ana Lucía', lote: 'A3', actividad: 'Cosecha', cantidad: 187, modalidad: 'Destajo' },
+  { id: 2, hora: '07:22', trabajador: 'Luis Alberto', lote: 'B2', actividad: 'Cosecha', cantidad: 162, modalidad: 'Destajo' },
+  { id: 3, hora: '07:30', trabajador: 'Carlos E.', lote: 'C4', actividad: 'Cosecha', cantidad: 145, modalidad: 'Jornal' },
+  { id: 4, hora: '08:05', trabajador: 'María Elena', lote: 'B3', actividad: 'Cosecha', cantidad: 128, modalidad: 'Destajo' },
+  { id: 5, hora: '08:12', trabajador: 'Jorge Antonio', lote: 'C2', actividad: 'Poda', cantidad: '-', modalidad: 'Jornal' },
+];
 
 export function Tareo() {
-  const [registros, setRegistros] = useState<RegistroCosecha[]>([]);
   const [trabajador, setTrabajador] = useState(TRABAJADORES[0]);
-  const [lote, setLote] = useState(LOTES[0].nombre);
-  const [fecha, setFecha] = useState(new Date().toISOString().split('T')[0]);
-  const [jabas, setJabas] = useState<number | ''>('');
+  const [lote, setLote] = useState(LOTES[0]);
+  const [actividad, setActividad] = useState(ACTIVIDADES[0]);
+  const [cantidad, setCantidad] = useState('');
+  const [modalidad, setModalidad] = useState(MODALIDADES[0]);
 
-  const handleRegistrar = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!jabas) return;
-    
-    const loteData = LOTES.find(l => l.nombre === lote);
-    
-    const nuevoRegistro: RegistroCosecha = {
-      id: Math.random().toString(36).substring(2, 9),
-      fecha,
-      trabajador,
-      lote,
-      cultivo: loteData?.cultivo || 'Desconocido',
-      jabas: Number(jabas)
-    };
-
-    setRegistros([nuevoRegistro, ...registros]);
-    setJabas('');
-  };
-
-  const handleExportCSV = () => {
-    if (registros.length === 0) return;
-
-    const headers = ['ID', 'Fecha', 'Trabajador', 'Lote', 'Cultivo', 'Jabas'];
-    const csvContent = [
-      headers.join(','),
-      ...registros.map(r => 
-        [r.id, r.fecha, `"${r.trabajador}"`, r.lote, r.cultivo, r.jabas].join(',')
-      )
-    ].join('\n');
-
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement("a");
-    const url = URL.createObjectURL(blob);
-    link.setAttribute("href", url);
-    link.setAttribute("download", `tareo_cosecha_${new Date().toISOString().split('T')[0]}.csv`);
-    link.style.visibility = 'hidden';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
+  const carenciaDias = CARENCIA_POR_LOTE[lote];
+  const isBlocked = carenciaDias !== null && actividad === 'Cosecha';
 
   return (
-    <div className="p-6 max-w-6xl mx-auto w-full">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-        <div>
-          <h2 className="text-2xl font-bold text-gray-800 tracking-tight">Tareo de Campo</h2>
-          <p className="text-gray-500 text-sm">Registro diario de cosecha directamente en campo.</p>
-        </div>
-        <button
-          onClick={handleExportCSV}
-          disabled={registros.length === 0}
-          className="flex items-center gap-2 bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
-        >
-          <Download size={16} />
-          Exportar a CSV
-        </button>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Formulario */}
-        <div className="lg:col-span-1">
-          <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
-            <h3 className="font-bold text-gray-700 mb-6">Nuevo Registro</h3>
-            <form onSubmit={handleRegistrar} className="space-y-4">
-              <div>
-                <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Fecha</label>
-                <input
-                  type="date"
-                  value={fecha}
-                  onChange={(e) => setFecha(e.target.value)}
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#556b2f]/50 focus:border-[#556b2f] font-mono text-sm"
-                  required
-                />
-              </div>
-              
-              <div>
-                <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Trabajador</label>
-                <select
-                  value={trabajador}
-                  onChange={(e) => setTrabajador(e.target.value)}
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#556b2f]/50 focus:border-[#556b2f] text-sm"
-                  required
-                >
-                  {TRABAJADORES.map(t => (
-                    <option key={t} value={t}>{t}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Lote (Cultivo)</label>
-                <select
-                  value={lote}
-                  onChange={(e) => setLote(e.target.value)}
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#556b2f]/50 focus:border-[#556b2f] text-sm"
-                  required
-                >
-                  {LOTES.map(l => (
-                    <option key={l.nombre} value={l.nombre}>{l.nombre} ({l.cultivo})</option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Jabas Cosechadas</label>
-                <input
-                  type="number"
-                  min="1"
-                  value={jabas}
-                  onChange={(e) => setJabas(e.target.value ? Number(e.target.value) : '')}
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#556b2f]/50 focus:border-[#556b2f] font-mono text-sm"
-                  placeholder="Ej: 45"
-                  required
-                />
-              </div>
-
-              <div className="pt-2">
-                <button
-                  type="submit"
-                  className="w-full bg-[#556b2f] hover:bg-[#556b2f]/90 text-white font-medium py-2.5 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
-                >
-                  <Plus size={18} />
-                  Registrar Cosecha
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-
-        {/* Tabla */}
-        <div className="lg:col-span-2">
-          <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden flex flex-col h-full">
-            <div className="p-4 border-b border-gray-100">
-              <h3 className="font-bold text-gray-700">Registros de Sesión ({registros.length})</h3>
+    <div className="p-6 max-w-6xl mx-auto w-full space-y-6">
+      <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
+        <h3 className="font-bold text-gray-700 mb-6">Registrar Tareo</h3>
+        <form className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
+            <div>
+              <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Trabajador</label>
+              <select
+                value={trabajador}
+                onChange={(e) => setTrabajador(e.target.value)}
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#556b2f]/50 focus:border-[#556b2f] text-sm"
+              >
+                {TRABAJADORES.map(t => <option key={t} value={t}>{t}</option>)}
+              </select>
             </div>
             
-            <div className="flex-1 overflow-x-auto min-h-[300px]">
-              {registros.length === 0 ? (
-                <div className="h-full flex flex-col items-center justify-center text-gray-400 p-8">
-                  <ClipboardList size={48} className="mb-4 opacity-20" />
-                  <p>No hay registros en esta sesión.</p>
-                  <p className="text-sm">Agrega uno desde el formulario.</p>
-                </div>
-              ) : (
-                <table className="w-full text-left text-sm whitespace-nowrap">
-                  <thead className="bg-gray-50/50 text-gray-500 font-medium border-b border-gray-100 text-xs">
-                    <tr>
-                      <th className="px-4 py-3 font-bold uppercase tracking-wider">Fecha</th>
-                      <th className="px-4 py-3 font-bold uppercase tracking-wider">Trabajador</th>
-                      <th className="px-4 py-3 font-bold uppercase tracking-wider">Lote</th>
-                      <th className="px-4 py-3 font-bold uppercase tracking-wider text-right">Jabas</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-50">
-                    {registros.map((r) => (
-                      <tr key={r.id} className="hover:bg-gray-50/50 transition-colors">
-                        <td className="px-4 py-3 font-mono text-xs text-gray-500">{r.fecha}</td>
-                        <td className="px-4 py-3 text-gray-800 font-medium">{r.trabajador}</td>
-                        <td className="px-4 py-3">
-                          <div className="flex items-center gap-1.5">
-                            <span className="text-gray-700">{r.lote}</span>
-                            <span className="text-[10px] bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded font-bold uppercase">
-                              {r.cultivo}
-                            </span>
-                          </div>
-                        </td>
-                        <td className="px-4 py-3 font-mono font-bold text-right text-gray-800">{r.jabas}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              )}
+            <div>
+              <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Lote</label>
+              <select
+                value={lote}
+                onChange={(e) => setLote(e.target.value)}
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#556b2f]/50 focus:border-[#556b2f] text-sm"
+              >
+                {LOTES.map(l => <option key={l} value={l}>{l}</option>)}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Actividad</label>
+              <select
+                value={actividad}
+                onChange={(e) => setActividad(e.target.value)}
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#556b2f]/50 focus:border-[#556b2f] text-sm"
+              >
+                {ACTIVIDADES.map(a => <option key={a} value={a}>{a}</option>)}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">CANT. COSECHADA (Jabas)</label>
+              <input
+                type="number"
+                value={cantidad}
+                onChange={(e) => setCantidad(e.target.value)}
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#556b2f]/50 focus:border-[#556b2f] font-mono text-sm"
+                placeholder="Ej: 45"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Modalidad de pago</label>
+              <select
+                value={modalidad}
+                onChange={(e) => setModalidad(e.target.value)}
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#556b2f]/50 focus:border-[#556b2f] text-sm"
+              >
+                {MODALIDADES.map(m => <option key={m} value={m}>{m}</option>)}
+              </select>
             </div>
           </div>
+          
+          {isBlocked && (
+            <div className="text-red-600 text-sm font-medium bg-red-50 p-3 rounded-lg border border-red-100 flex items-start gap-2">
+              <span>⚠️ Bloqueado: Lote en periodo de carencia activa ({carenciaDias} días restantes). Registrar esta cosecha expondría el lote a rechazo en exportación.</span>
+            </div>
+          )}
+
+          <div className="flex justify-end pt-2">
+            <button
+              type="button"
+              disabled={isBlocked}
+              className={`font-medium py-2 px-6 rounded-lg transition-colors text-sm ${
+                isBlocked 
+                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed opacity-70' 
+                  : 'bg-[#556b2f] hover:bg-[#556b2f]/90 text-white'
+              }`}
+            >
+              Registrar Tareo
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+        <div className="p-5 border-b border-gray-100">
+          <h3 className="font-bold text-gray-700">Registros de Hoy</h3>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-sm whitespace-nowrap">
+            <thead className="bg-gray-50/50 text-gray-500 font-medium border-b border-gray-100 text-xs">
+              <tr>
+                <th className="px-5 py-3 font-bold uppercase tracking-wider">Hora</th>
+                <th className="px-5 py-3 font-bold uppercase tracking-wider">Trabajador</th>
+                <th className="px-5 py-3 font-bold uppercase tracking-wider">Lote</th>
+                <th className="px-5 py-3 font-bold uppercase tracking-wider">Actividad</th>
+                <th className="px-5 py-3 font-bold uppercase tracking-wider">Cantidad</th>
+                <th className="px-5 py-3 font-bold uppercase tracking-wider">Modalidad</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-50">
+              {INITIAL_REGISTERS.map((r, i) => (
+                <tr key={i} className="hover:bg-gray-50/50 transition-colors">
+                  <td className="px-5 py-3 font-mono text-xs text-gray-500">{r.hora}</td>
+                  <td className="px-5 py-3 font-medium text-gray-800">{r.trabajador}</td>
+                  <td className="px-5 py-3">
+                    <span className="font-medium text-gray-700 bg-gray-100/80 border border-gray-200/60 px-2.5 py-1 rounded-md text-xs">
+                      {r.lote}
+                    </span>
+                  </td>
+                  <td className="px-5 py-3">
+                    <span className={`px-2.5 py-1 rounded-md text-xs font-semibold ${
+                      r.actividad === 'Cosecha' ? 'bg-green-50 text-green-700 border border-green-100/50' : 'bg-orange-50 text-orange-700 border border-orange-100/50'
+                    }`}>
+                      {r.actividad}
+                    </span>
+                  </td>
+                  <td className="px-5 py-3 font-mono text-gray-800">{r.cantidad}</td>
+                  <td className="px-5 py-3 text-gray-600 text-sm">{r.modalidad}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
