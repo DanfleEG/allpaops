@@ -34,7 +34,7 @@ export const INITIAL_REGISTERS = [
   { id: 5, hora: '08:12', trabajador: 'Jorge Antonio', lote: 'C2', actividad: 'Poda', cantidad: '-', modalidad: 'Jornal' },
 ];
 
-export function Tareo({ registros = INITIAL_REGISTERS, setRegistros, setTotalJabasHoy }: any) {
+export function Tareo({ setTotalJabasHoy }: any) {
   const [dni, setDni] = useState('');
   const [trabajadorId, setTrabajadorId] = useState<string | null>(null);
   const [trabajadorNombre, setTrabajadorNombre] = useState<string | null>(null);
@@ -47,8 +47,36 @@ export function Tareo({ registros = INITIAL_REGISTERS, setRegistros, setTotalJab
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
+  const [registrosTareo, setRegistrosTareo] = useState<any[]>([]);
+  const [loadingRegistros, setLoadingRegistros] = useState(true);
+  const [errorRegistros, setErrorRegistros] = useState('');
+
   const carenciaDias = CARENCIA_POR_LOTE[lote];
   const isBlocked = carenciaDias !== null && actividad === 'Cosecha';
+
+  const fetchRegistros = async () => {
+    setLoadingRegistros(true);
+    setErrorRegistros('');
+    try {
+      const { data, error } = await supabase
+        .from('tareo_registros')
+        .select('*, trabajadores(nombre), lotes(codigo)')
+        .order('hora_registro', { ascending: false });
+
+      if (error) {
+        throw error;
+      }
+      setRegistrosTareo(data || []);
+    } catch (err: any) {
+      setErrorRegistros(err.message || 'Error al cargar los registros');
+    } finally {
+      setLoadingRegistros(false);
+    }
+  };
+
+  React.useEffect(() => {
+    fetchRegistros();
+  }, []);
 
   // Buscar DNI Effect
   React.useEffect(() => {
@@ -124,17 +152,7 @@ export function Tareo({ registros = INITIAL_REGISTERS, setRegistros, setTotalJab
         throw new Error(`Error al insertar: ${insertError.message}`);
       }
       
-      const nuevoRegistro = {
-        id: Date.now(),
-        hora: new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),
-        trabajador: trabajadorNombre,
-        lote,
-        actividad,
-        cantidad: actividad === 'Cosecha' ? (cantidad || '0') : '-',
-        modalidad,
-      };
-
-      setRegistros?.([nuevoRegistro, ...registros]);
+      await fetchRegistros();
 
       if (actividad === 'Cosecha' && numCantidad > 0) {
         setTotalJabasHoy?.((prev: number) => prev + numCantidad);
@@ -291,13 +309,36 @@ export function Tareo({ registros = INITIAL_REGISTERS, setRegistros, setTotalJab
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
-              {registros.map((r: any, i: number) => (
+              {loadingRegistros && (
+                <tr>
+                  <td colSpan={6} className="px-5 py-8 text-center text-gray-500 font-medium tracking-wide">
+                    Cargando registros...
+                  </td>
+                </tr>
+              )}
+              {errorRegistros && !loadingRegistros && (
+                <tr>
+                  <td colSpan={6} className="px-5 py-8 text-center text-red-500 font-medium">
+                    {errorRegistros}
+                  </td>
+                </tr>
+              )}
+              {!loadingRegistros && !errorRegistros && registrosTareo.length === 0 && (
+                <tr>
+                  <td colSpan={6} className="px-5 py-8 text-center text-gray-500 font-medium">
+                    No hay registros de hoy
+                  </td>
+                </tr>
+              )}
+              {!loadingRegistros && !errorRegistros && registrosTareo.map((r: any, i: number) => (
                 <tr key={i} className="hover:bg-gray-50/50 transition-colors">
-                  <td className="px-5 py-3 font-mono text-xs text-gray-500">{r.hora}</td>
-                  <td className="px-5 py-3 font-medium text-gray-800">{r.trabajador}</td>
+                  <td className="px-5 py-3 font-mono text-xs text-gray-500">
+                    {r.hora_registro ? new Date(r.hora_registro.replace(' ', 'T') + 'Z').toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Lima' }) : ''}
+                  </td>
+                  <td className="px-5 py-3 font-medium text-gray-800">{r.trabajadores?.nombre}</td>
                   <td className="px-5 py-3">
                     <span className="font-medium text-gray-700 bg-gray-100/80 border border-gray-200/60 px-2.5 py-1 rounded-md text-xs">
-                      {r.lote}
+                      {r.lotes?.codigo}
                     </span>
                   </td>
                   <td className="px-5 py-3">
@@ -307,8 +348,8 @@ export function Tareo({ registros = INITIAL_REGISTERS, setRegistros, setTotalJab
                       {r.actividad}
                     </span>
                   </td>
-                  <td className="px-5 py-3 font-mono text-gray-800">{r.cantidad}</td>
-                  <td className="px-5 py-3 text-gray-600 text-sm">{r.modalidad}</td>
+                  <td className="px-5 py-3 font-mono text-gray-800">{r.cantidad_jabas || '-'}</td>
+                  <td className="px-5 py-3 text-gray-600 text-sm">{r.modalidad_pago}</td>
                 </tr>
               ))}
             </tbody>
