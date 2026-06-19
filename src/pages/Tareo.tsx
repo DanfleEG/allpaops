@@ -1,6 +1,13 @@
 import React, { useState } from 'react';
+import { Lock } from 'lucide-react';
 
-const TRABAJADORES = ['Ana Lucía', 'Luis Alberto', 'Carlos E.', 'María Elena', 'Jorge Antonio'];
+const TRABAJADORES = [
+  'Ana Lucía — DNI 45218976',
+  'Luis Alberto — DNI 41873209',
+  'Carlos E. — DNI 47625183',
+  'María Elena — DNI 44910267',
+  'Jorge Antonio — DNI 46327510'
+];
 const LOTES = ['A1', 'A2', 'A3', 'B1', 'B2', 'B3', 'C1', 'C2', 'C3', 'C4'];
 const ACTIVIDADES = ['Cosecha', 'Poda', 'Fumigación', 'Riego', 'Deshierbe'];
 const MODALIDADES = ['Destajo', 'Jornal'];
@@ -40,17 +47,31 @@ export function Tareo() {
     <div className="p-6 max-w-6xl mx-auto w-full space-y-6">
       <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
         <h3 className="font-bold text-gray-700 mb-6">Registrar Tareo</h3>
-        <form className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
+        <form className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
             <div>
               <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Trabajador</label>
               <select
                 value={trabajador}
                 onChange={(e) => setTrabajador(e.target.value)}
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#556b2f]/50 focus:border-[#556b2f] text-sm"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#556b2f]/50 focus:border-[#556b2f] text-sm truncate pr-8"
               >
                 {TRABAJADORES.map(t => <option key={t} value={t}>{t}</option>)}
               </select>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Hora de Registro</label>
+              <div className="relative">
+                <input
+                  type="text"
+                  value={new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}
+                  readOnly
+                  className="w-full border border-gray-200 bg-gray-50 rounded-lg pl-3 pr-10 py-2 text-gray-500 focus:outline-none focus:ring-0 font-mono text-sm cursor-not-allowed"
+                />
+                <Lock size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" />
+              </div>
+              <p className="mt-1 text-[10px] text-gray-400">Generado automáticamente — no editable</p>
             </div>
             
             <div>
@@ -75,16 +96,20 @@ export function Tareo() {
               </select>
             </div>
 
-            <div>
-              <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">CANT. COSECHADA (Jabas)</label>
-              <input
-                type="number"
-                value={cantidad}
-                onChange={(e) => setCantidad(e.target.value)}
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#556b2f]/50 focus:border-[#556b2f] font-mono text-sm"
-                placeholder="Ej: 45"
-              />
-            </div>
+            {actividad === 'Cosecha' ? (
+              <div>
+                <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">CANT. COSECHADA (Jabas)</label>
+                <input
+                  type="number"
+                  value={cantidad}
+                  onChange={(e) => setCantidad(e.target.value)}
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#556b2f]/50 focus:border-[#556b2f] font-mono text-sm"
+                  placeholder="Ej: 45"
+                />
+              </div>
+            ) : (
+              <div className="hidden lg:block"></div>
+            )}
 
             <div>
               <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Modalidad de pago</label>
@@ -98,9 +123,18 @@ export function Tareo() {
             </div>
           </div>
           
-          {isBlocked && (
-            <div className="text-red-600 text-sm font-medium bg-red-50 p-3 rounded-lg border border-red-100 flex items-start gap-2">
-              <span>⚠️ Bloqueado: Lote en periodo de carencia activa ({carenciaDias} días restantes). Registrar esta cosecha expondría el lote a rechazo en exportación.</span>
+          {(isBlocked || (modalidad === 'Destajo' && actividad === 'Cosecha' && cantidad && !isNaN(Number(cantidad)))) && (
+            <div className="w-full">
+              {isBlocked && (
+                <div className="text-red-600 text-sm font-medium bg-red-50 p-3 rounded-lg border border-red-100 flex items-start gap-2">
+                  <span>⚠️ Bloqueado: Lote en periodo de carencia activa ({carenciaDias} días restantes). Registrar esta cosecha expondría el lote a rechazo en exportación.</span>
+                </div>
+              )}
+              {!isBlocked && modalidad === 'Destajo' && actividad === 'Cosecha' && cantidad && !isNaN(Number(cantidad)) && (
+                <div className="bg-green-50 text-green-800 text-sm font-medium p-3 rounded-lg border border-green-200 shadow-sm">
+                  Pago estimado: S/ {(Number(cantidad) * 0.8).toFixed(2)}
+                </div>
+              )}
             </div>
           )}
 
