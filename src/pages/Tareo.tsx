@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Lock } from 'lucide-react';
+import { supabase } from '../lib/supabaseClient';
 
 const TRABAJADORES = [
   'Ana Lucía — DNI 45218976',
@@ -34,42 +35,122 @@ export const INITIAL_REGISTERS = [
 ];
 
 export function Tareo({ registros = INITIAL_REGISTERS, setRegistros, setTotalJabasHoy }: any) {
-  const [trabajador, setTrabajador] = useState(TRABAJADORES[0]);
+  const [dni, setDni] = useState('');
+  const [trabajadorId, setTrabajadorId] = useState<string | null>(null);
+  const [trabajadorNombre, setTrabajadorNombre] = useState<string | null>(null);
+  const [dniStatus, setDniStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+
   const [lote, setLote] = useState(LOTES[0]);
   const [actividad, setActividad] = useState(ACTIVIDADES[0]);
   const [cantidad, setCantidad] = useState('');
   const [modalidad, setModalidad] = useState(MODALIDADES[0]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
 
   const carenciaDias = CARENCIA_POR_LOTE[lote];
   const isBlocked = carenciaDias !== null && actividad === 'Cosecha';
 
-  const handleRegistrar = () => {
-    if (isBlocked) return;
-
-    const numCantidad = actividad === 'Cosecha' ? (parseInt(cantidad) || 0) : 0;
-    
-    const nuevoRegistro = {
-      id: Date.now(),
-      hora: new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),
-      trabajador: trabajador.split(' — ')[0], // only show name in table
-      lote,
-      actividad,
-      cantidad: actividad === 'Cosecha' ? (cantidad || '0') : '-',
-      modalidad,
+  // Buscar DNI Effect
+  React.useEffect(() => {
+    const searchDNI = async () => {
+      if (!dni) {
+        setDniStatus('idle');
+        setTrabajadorId(null);
+        setTrabajadorNombre(null);
+        return;
+      }
+      if (dni.length < 8) return; // Optional logic, or just let it search if it's less
+      
+      setDniStatus('loading');
+      const { data, error } = await supabase
+        .from('trabajadores')
+        .select('id, nombre')
+        .eq('dni', dni)
+        .limit(1)
+        .single();
+        
+      if (!error && data) {
+        setTrabajadorId(data.id);
+        setTrabajadorNombre(data.nombre);
+        setDniStatus('success');
+      } else {
+        setTrabajadorId(null);
+        setTrabajadorNombre(null);
+        setDniStatus('error');
+      }
     };
+    
+    // Debounce
+    const timerId = setTimeout(() => {
+      searchDNI();
+    }, 500);
+    
+    return () => clearTimeout(timerId);
+  }, [dni]);
 
-    setRegistros?.([nuevoRegistro, ...registros]);
+  const handleRegistrar = async () => {
+    if (isBlocked || !trabajadorId) return;
+    
+    setIsSubmitting(true);
+    setErrorMsg('');
 
-    if (actividad === 'Cosecha' && numCantidad > 0) {
-      setTotalJabasHoy?.((prev: number) => prev + numCantidad);
+    try {
+      const numCantidad = actividad === 'Cosecha' ? (parseInt(cantidad) || 0) : 0;
+
+      // 1. Fetch lote_id
+      const { data: loteData, error: loteError } = await supabase
+        .from('lotes')
+        .select('id')
+        .eq('codigo', lote)
+        .limit(1)
+        .single();
+
+      if (loteError || !loteData) {
+        throw new Error('No se encontró el lote en Supabase');
+      }
+
+      // 2. Insert into tareo_registros
+      const { error: insertError } = await supabase
+        .from('tareo_registros')
+        .insert({
+          trabajador_id: trabajadorId,
+          lote_id: loteData.id,
+          actividad: actividad,
+          cantidad_jabas: actividad === 'Cosecha' ? numCantidad : null,
+          modalidad_pago: modalidad
+        });
+
+      if (insertError) {
+        throw new Error(`Error al insertar: ${insertError.message}`);
+      }
+      
+      const nuevoRegistro = {
+        id: Date.now(),
+        hora: new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),
+        trabajador: trabajadorNombre,
+        lote,
+        actividad,
+        cantidad: actividad === 'Cosecha' ? (cantidad || '0') : '-',
+        modalidad,
+      };
+
+      setRegistros?.([nuevoRegistro, ...registros]);
+
+      if (actividad === 'Cosecha' && numCantidad > 0) {
+        setTotalJabasHoy?.((prev: number) => prev + numCantidad);
+      }
+
+      // Reset form
+      setDni('');
+      setLote(LOTES[0]);
+      setActividad(ACTIVIDADES[0]);
+      setCantidad('');
+      setModalidad(MODALIDADES[0]);
+    } catch (err: any) {
+      setErrorMsg(err.message || 'Hubo un error inesperado al registrar');
+    } finally {
+      setIsSubmitting(false);
     }
-
-    // Reset form
-    setTrabajador(TRABAJADORES[0]);
-    setLote(LOTES[0]);
-    setActividad(ACTIVIDADES[0]);
-    setCantidad('');
-    setModalidad(MODALIDADES[0]);
   };
 
   return (
@@ -79,14 +160,18 @@ export function Tareo({ registros = INITIAL_REGISTERS, setRegistros, setTotalJab
         <form className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
             <div>
-              <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Trabajador</label>
-              <select
-                value={trabajador}
-                onChange={(e) => setTrabajador(e.target.value)}
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#556b2f]/50 focus:border-[#556b2f] text-sm truncate pr-8"
-              >
-                {TRABAJADORES.map(t => <option key={t} value={t}>{t}</option>)}
-              </select>
+              <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">DNI del Trabajador</label>
+              <input
+                type="text"
+                value={dni}
+                onChange={(e) => setDni(e.target.value.replace(/\D/g, ''))}
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#556b2f]/50 focus:border-[#556b2f] text-sm"
+                placeholder="Ej: 45218976"
+                maxLength={8}
+              />
+              {dniStatus === 'loading' && <p className="mt-1 text-[11px] text-gray-500">Buscando...</p>}
+              {dniStatus === 'success' && <p className="mt-1 text-[11px] text-green-600 font-medium">✓ {trabajadorNombre}</p>}
+              {dniStatus === 'error' && dni.length > 0 && <p className="mt-1 text-[11px] text-red-600 font-medium">✗ DNI no encontrado en el sistema</p>}
             </div>
 
             <div>
@@ -167,19 +252,24 @@ export function Tareo({ registros = INITIAL_REGISTERS, setRegistros, setTotalJab
             </div>
           )}
 
-          <div className="flex justify-end pt-2">
+          <div className="flex flex-col items-end pt-2 gap-2">
             <button
               type="button"
               onClick={handleRegistrar}
-              disabled={isBlocked}
+              disabled={isBlocked || isSubmitting || !trabajadorId}
               className={`font-medium py-2 px-6 rounded-lg transition-colors text-sm ${
-                isBlocked 
+                isBlocked || isSubmitting || !trabajadorId
                   ? 'bg-gray-300 text-gray-500 cursor-not-allowed opacity-70' 
                   : 'bg-[#556b2f] hover:bg-[#556b2f]/90 text-white'
               }`}
             >
-              Registrar Tareo
+              {isSubmitting ? 'Registrando...' : 'Registrar Tareo'}
             </button>
+            {errorMsg && (
+              <div className="text-red-500 text-xs font-medium bg-red-50 px-3 py-1.5 rounded-md border border-red-100">
+                {errorMsg}
+              </div>
+            )}
           </div>
         </form>
       </div>
