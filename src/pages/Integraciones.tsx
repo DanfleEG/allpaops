@@ -1,19 +1,113 @@
 import React, { useState } from 'react';
-import { Database, MessageSquare, Network, Building2, Server, CheckCircle2, X, Send, Smartphone, MessageCircle, Workflow, Zap, Hash } from 'lucide-react';
+import { Database, MessageSquare, Network, Building2, Server, CheckCircle2, X, Send, Smartphone, MessageCircle, Workflow, Zap, Hash, Eye, EyeOff } from 'lucide-react';
 import { ERPS } from '../data';
+import { createClient } from '@supabase/supabase-js';
 
 interface ModalData {
   title: string;
-  type: 'db' | 'redis' | 'mcp' | 'whatsapp' | 'telegram' | 'sms' | 'erp' | 'n8n' | 'slack' | 'zapier';
+  type: 'db' | 'redis' | 'mcp' | 'whatsapp' | 'telegram' | 'sms' | 'erp' | 'n8n' | 'slack' | 'zapier' | 'supabase';
   name?: string;
   configStr?: string;
 }
 
+function SupabaseConnectionTest({ onSuccess }: { onSuccess: () => void }) {
+  const [url, setUrl] = useState('');
+  const [key, setKey] = useState('');
+  const [showKey, setShowKey] = useState(false);
+  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [errorMsg, setErrorMsg] = useState('');
+
+  const testConnection = async () => {
+    if (!url || !key) return;
+    setStatus('loading');
+    setErrorMsg('');
+    try {
+      const supabase = createClient(url, key);
+      const { data, error } = await supabase.from('cultivos').select('*').limit(1);
+      
+      if (error) {
+        throw error;
+      }
+      
+      setStatus('success');
+      onSuccess();
+    } catch (err: any) {
+      setStatus('error');
+      setErrorMsg(err.message || 'Error desconocido al conectar con Supabase');
+    }
+  };
+
+  return (
+    <div className="space-y-4">
+      <div>
+        <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Project URL</label>
+        <input 
+          type="text" 
+          value={url}
+          onChange={(e) => setUrl(e.target.value)}
+          placeholder="https://tu-proyecto.supabase.co"
+          className="w-full border border-gray-200 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#556b2f]/50 focus:border-[#556b2f] text-sm"
+        />
+      </div>
+      <div>
+        <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Anon/Public Key</label>
+        <div className="relative">
+          <input 
+            type={showKey ? "text" : "password"}
+            value={key}
+            onChange={(e) => setKey(e.target.value)}
+            placeholder="eyJ..."
+            className="w-full border border-gray-200 rounded-lg pl-3 pr-10 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#556b2f]/50 focus:border-[#556b2f] text-sm"
+          />
+          <button 
+            type="button"
+            onClick={() => setShowKey(!showKey)}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+          >
+            {showKey ? <EyeOff size={16} /> : <Eye size={16} />}
+          </button>
+        </div>
+      </div>
+      
+      <button
+        onClick={testConnection}
+        disabled={status === 'loading' || !url || !key}
+        className={`w-full font-medium py-2 px-4 rounded-lg transition-colors text-sm ${
+          status === 'loading' || !url || !key
+            ? 'bg-gray-300 text-gray-500 cursor-not-allowed opacity-70'
+            : 'bg-[#556b2f] hover:bg-[#556b2f]/90 text-white'
+        }`}
+      >
+        {status === 'loading' ? 'Probando...' : 'Probar Conexión'}
+      </button>
+
+      {status === 'success' && (
+        <div className="text-sm font-medium bg-green-50 text-green-700 p-3 rounded-lg border border-green-200 flex items-start gap-2">
+           <CheckCircle2 size={18} className="shrink-0 mt-0.5 text-green-600"/>
+           <span>✓ Conexión exitosa — Base de datos respondiendo correctamente</span>
+        </div>
+      )}
+
+      {status === 'error' && (
+        <div className="text-sm font-medium bg-red-50 text-red-700 p-3 rounded-lg border border-red-200 flex items-start gap-2 break-words">
+           <X size={18} className="shrink-0 mt-0.5 text-red-600"/>
+           <span>✗ No se pudo conectar: {errorMsg}</span>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function Integraciones() {
   const [modal, setModal] = useState<ModalData | null>(null);
+  const [supabaseSuccess, setSupabaseSuccess] = useState(false);
 
   const renderModalContent = () => {
     if (!modal) return null;
+
+    if (modal.type === 'supabase') {
+      return <SupabaseConnectionTest onSuccess={() => setSupabaseSuccess(true)} />;
+    }
 
     if (modal.type === 'db') {
       return (
@@ -240,7 +334,7 @@ export function Integraciones() {
               Conexión a cluster gestionado de Supabase para integraciones modernas.
             </p>
             <button 
-              onClick={() => setModal({ title: 'Configuración Supabase', type: 'db', configStr: 'aws-eu-central-1.supabase.com' })}
+              onClick={() => { setModal({ title: 'Conectar Supabase', type: 'supabase' }); setSupabaseSuccess(false); }}
               className="w-full bg-gray-50 hover:bg-gray-100 text-gray-800 font-medium py-2 rounded-lg transition-colors text-sm border border-gray-200 shadow-sm"
             >
               Ver Conexión
@@ -435,11 +529,13 @@ export function Integraciones() {
 
       {modal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-white rounded-xl w-full max-w-md shadow-xl border border-gray-100 overflow-hidden animate-in zoom-in-95 duration-200">
-            <div className="flex items-center justify-between p-4 border-b border-gray-100 bg-gray-50/50">
+          <div className={`bg-white rounded-xl w-full max-w-md shadow-xl border overflow-hidden animate-in zoom-in-95 duration-200 ${
+            supabaseSuccess ? 'border-green-500 ring-4 ring-green-500/10' : 'border-gray-100'
+          }`}>
+            <div className={`flex items-center justify-between p-4 border-b bg-gray-50/50 ${supabaseSuccess ? 'border-green-100' : 'border-gray-100'}`}>
               <h3 className="font-bold text-gray-900">{modal.title}</h3>
               <button 
-                onClick={() => setModal(null)}
+                onClick={() => { setModal(null); setSupabaseSuccess(false); }}
                 className="p-1 hover:bg-gray-200 rounded-md transition-colors text-gray-500"
               >
                 <X size={20} />
@@ -448,9 +544,9 @@ export function Integraciones() {
             <div className="p-6">
               {renderModalContent()}
             </div>
-            <div className="p-4 border-t border-gray-100 bg-gray-50 flex justify-end">
+            <div className={`p-4 border-t bg-gray-50 flex justify-end ${supabaseSuccess ? 'border-green-100' : 'border-gray-100'}`}>
               <button 
-                onClick={() => setModal(null)}
+                onClick={() => { setModal(null); setSupabaseSuccess(false); }}
                 className="px-6 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 font-medium py-2 rounded-lg transition-colors shadow-sm"
               >
                 Cerrar
