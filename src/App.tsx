@@ -8,7 +8,7 @@ import { Clock, Calendar } from 'lucide-react';
 import { Login } from './pages/Login';
 import { Sidebar } from './components/Sidebar';
 import { Dashboard } from './pages/Dashboard';
-import { Tareo } from './pages/Tareo';
+import { Tareo, INITIAL_REGISTERS } from './pages/Tareo';
 import { Sanidad } from './pages/Sanidad';
 import { Trazabilidad } from './pages/Trazabilidad';
 import { MapaLotes } from './pages/MapaLotes';
@@ -18,6 +18,9 @@ export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [activeTab, setActiveTab] = useState('dashboard');
   const [currentTime, setCurrentTime] = useState(new Date());
+
+  const [totalJabasHoy, setTotalJabasHoy] = useState(1942);
+  const [registrosTareo, setRegistrosTareo] = useState(INITIAL_REGISTERS);
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
@@ -44,9 +47,13 @@ export default function App() {
   const renderContent = () => {
     switch (activeTab) {
       case 'dashboard':
-        return <Dashboard />;
+        return <Dashboard totalJabasHoy={totalJabasHoy} />;
       case 'tareo':
-        return <Tareo />;
+        return <Tareo 
+          registros={registrosTareo} 
+          setRegistros={setRegistrosTareo} 
+          setTotalJabasHoy={setTotalJabasHoy} 
+        />;
       case 'sanidad':
         return <Sanidad />;
       case 'trazabilidad':
@@ -56,7 +63,7 @@ export default function App() {
       case 'integraciones':
         return <Integraciones />;
       default:
-        return <Dashboard />;
+        return <Dashboard totalJabasHoy={totalJabasHoy} />;
     }
   };
 

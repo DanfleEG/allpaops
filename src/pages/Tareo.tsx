@@ -25,7 +25,7 @@ const CARENCIA_POR_LOTE: Record<string, number | null> = {
   'C4': null,
 };
 
-const INITIAL_REGISTERS = [
+export const INITIAL_REGISTERS = [
   { id: 1, hora: '07:15', trabajador: 'Ana Lucía', lote: 'A3', actividad: 'Cosecha', cantidad: 187, modalidad: 'Destajo' },
   { id: 2, hora: '07:22', trabajador: 'Luis Alberto', lote: 'B2', actividad: 'Cosecha', cantidad: 162, modalidad: 'Destajo' },
   { id: 3, hora: '07:30', trabajador: 'Carlos E.', lote: 'C4', actividad: 'Cosecha', cantidad: 145, modalidad: 'Jornal' },
@@ -33,7 +33,7 @@ const INITIAL_REGISTERS = [
   { id: 5, hora: '08:12', trabajador: 'Jorge Antonio', lote: 'C2', actividad: 'Poda', cantidad: '-', modalidad: 'Jornal' },
 ];
 
-export function Tareo() {
+export function Tareo({ registros = INITIAL_REGISTERS, setRegistros, setTotalJabasHoy }: any) {
   const [trabajador, setTrabajador] = useState(TRABAJADORES[0]);
   const [lote, setLote] = useState(LOTES[0]);
   const [actividad, setActividad] = useState(ACTIVIDADES[0]);
@@ -42,6 +42,35 @@ export function Tareo() {
 
   const carenciaDias = CARENCIA_POR_LOTE[lote];
   const isBlocked = carenciaDias !== null && actividad === 'Cosecha';
+
+  const handleRegistrar = () => {
+    if (isBlocked) return;
+
+    const numCantidad = actividad === 'Cosecha' ? (parseInt(cantidad) || 0) : 0;
+    
+    const nuevoRegistro = {
+      id: Date.now(),
+      hora: new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),
+      trabajador: trabajador.split(' — ')[0], // only show name in table
+      lote,
+      actividad,
+      cantidad: actividad === 'Cosecha' ? (cantidad || '0') : '-',
+      modalidad,
+    };
+
+    setRegistros?.([nuevoRegistro, ...registros]);
+
+    if (actividad === 'Cosecha' && numCantidad > 0) {
+      setTotalJabasHoy?.((prev: number) => prev + numCantidad);
+    }
+
+    // Reset form
+    setTrabajador(TRABAJADORES[0]);
+    setLote(LOTES[0]);
+    setActividad(ACTIVIDADES[0]);
+    setCantidad('');
+    setModalidad(MODALIDADES[0]);
+  };
 
   return (
     <div className="p-6 max-w-6xl mx-auto w-full space-y-6">
@@ -141,6 +170,7 @@ export function Tareo() {
           <div className="flex justify-end pt-2">
             <button
               type="button"
+              onClick={handleRegistrar}
               disabled={isBlocked}
               className={`font-medium py-2 px-6 rounded-lg transition-colors text-sm ${
                 isBlocked 
@@ -171,7 +201,7 @@ export function Tareo() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
-              {INITIAL_REGISTERS.map((r, i) => (
+              {registros.map((r: any, i: number) => (
                 <tr key={i} className="hover:bg-gray-50/50 transition-colors">
                   <td className="px-5 py-3 font-mono text-xs text-gray-500">{r.hora}</td>
                   <td className="px-5 py-3 font-medium text-gray-800">{r.trabajador}</td>

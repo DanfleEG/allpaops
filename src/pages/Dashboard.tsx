@@ -1,47 +1,47 @@
 import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
 
-const kpis = [
-  { label: 'Total Jabas Hoy', value: '1,942' },
-  { label: 'Total Jabas Período Completo', value: '31,652' },
-  { label: 'Trabajadores Activos Hoy', value: '24 de 30' },
-  { label: 'Lotes en Carencia Activa', value: '5 de 10' }
-];
+export function Dashboard({ totalJabasHoy = 1942 }: { totalJabasHoy?: number }) {
+  const kpis = [
+    { label: 'Total Jabas Hoy', value: totalJabasHoy.toLocaleString('en-US') },
+    { label: 'Total Jabas Período Completo', value: '31,652' },
+    { label: 'Trabajadores Activos Hoy', value: '24 de 30' },
+    { label: 'Lotes en Carencia Activa', value: '5 de 10' }
+  ];
 
-const dataTrabajadores = [
-  { name: 'Ana Lucía', jabas: 185 },
-  { name: 'Luis Alberto', jabas: 162 },
-  { name: 'Carlos E.', jabas: 145 },
-  { name: 'María Elena', jabas: 130 },
-  { name: 'Jorge Antonio', jabas: 121 },
-];
+  const dataTrabajadores = [
+    { name: 'Ana Lucía', jabas: 185 },
+    { name: 'Luis Alberto', jabas: 162 },
+    { name: 'Carlos E.', jabas: 145 },
+    { name: 'María Elena', jabas: 130 },
+    { name: 'Jorge Antonio', jabas: 121 },
+  ];
 
-const dataCultivos = [
-  { name: 'Palta', value: 41 },
-  { name: 'Arándano', value: 30 },
-  { name: 'Uva', value: 29 },
-];
+  const dataCultivos = [
+    { name: 'Palta', value: 41 },
+    { name: 'Arándano', value: 30 },
+    { name: 'Uva', value: 29 },
+  ];
 
-const COLORS = ['#556b2f', '#819835', '#b5c873'];
+  const COLORS = ['#556b2f', '#819835', '#b5c873'];
 
-const dataEvolucion = [
-  { dia: 'Lun', jabas: 1200 },
-  { dia: 'Mar', jabas: 1450 },
-  { dia: 'Mié', jabas: 1600 },
-  { dia: 'Jue', jabas: 1850 },
-  { dia: 'Vie', jabas: 1700 },
-  { dia: 'Sáb', jabas: 1942 },
-];
+  const dataEvolucion = [
+    { dia: 'Lun', jabas: 1200 },
+    { dia: 'Mar', jabas: 1450 },
+    { dia: 'Mié', jabas: 1600 },
+    { dia: 'Jue', jabas: 1850 },
+    { dia: 'Vie', jabas: 1700 },
+    { dia: 'Sáb', jabas: 1942 },
+  ];
 
-const dataRendimiento = [
-  { lote: 'B1', rto: 145 },
-  { lote: 'B2', rto: 130 },
-  { lote: 'A1', rto: 120 },
-  { lote: 'C2', rto: 110 },
-  { lote: 'A3', rto: 95 },
-];
+  const dataRendimiento = [
+    { lote: 'B1', rto: 145 },
+    { lote: 'B2', rto: 130 },
+    { lote: 'A1', rto: 120 },
+    { lote: 'C2', rto: 110 },
+    { lote: 'A3', rto: 95 },
+  ];
 
-export function Dashboard() {
   return (
     <div className="p-6 max-w-7xl mx-auto w-full">
       <div className="mb-6">
