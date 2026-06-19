@@ -28,7 +28,7 @@ const CARENCIA_POR_LOTE: Record<string, number | null> = {
 export const INITIAL_REGISTERS = [
   { id: 1, hora: '07:15', trabajador: 'Ana Lucía', lote: 'A3', actividad: 'Cosecha', cantidad: 187, modalidad: 'Destajo' },
   { id: 2, hora: '07:22', trabajador: 'Luis Alberto', lote: 'B2', actividad: 'Cosecha', cantidad: 162, modalidad: 'Destajo' },
-  { id: 3, hora: '07:30', trabajador: 'Carlos E.', lote: 'C4', actividad: 'Cosecha', cantidad: 145, modalidad: 'Jornal' },
+  { id: 3, hora: '07:30', trabajador: 'Carlos E.', lote: 'A3', actividad: 'Cosecha', cantidad: 199, modalidad: 'Jornal' },
   { id: 4, hora: '08:05', trabajador: 'María Elena', lote: 'B3', actividad: 'Cosecha', cantidad: 128, modalidad: 'Destajo' },
   { id: 5, hora: '08:12', trabajador: 'Jorge Antonio', lote: 'C2', actividad: 'Poda', cantidad: '-', modalidad: 'Jornal' },
 ];
