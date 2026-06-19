@@ -10,14 +10,18 @@ export function MapaLotes() {
       </div>
 
       <div className="bg-white rounded-xl border border-gray-100 p-8 shadow-sm">
-        <div className="flex gap-6 mb-8 text-sm">
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded bg-green-100 border border-green-200"></div>
-            <span className="text-gray-600 font-medium">Apto para Cosecha</span>
-          </div>
+        <div className="flex gap-6 mb-8 text-sm flex-wrap">
           <div className="flex items-center gap-2">
             <div className="w-4 h-4 rounded bg-red-100 border border-red-200"></div>
             <span className="text-gray-600 font-medium">En Carencia Activa</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-4 h-4 rounded bg-green-100 border border-green-200"></div>
+            <span className="text-gray-600 font-medium">Listo para Cosecha</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-4 h-4 rounded bg-blue-100 border border-blue-200"></div>
+            <span className="text-gray-600 font-medium">Cosechado Seguro</span>
           </div>
         </div>
 
@@ -30,8 +34,10 @@ export function MapaLotes() {
                 key={lote.nombre}
                 className={`
                   aspect-square rounded-xl border relative p-4 flex flex-col justify-end transition-transform hover:scale-[1.02] cursor-default shadow-sm
-                  ${isEnCarencia 
+                  ${lote.estado === 'En Carencia Activa' 
                     ? 'bg-red-50/30 border-red-200 hover:border-red-300' 
+                    : lote.estado === 'Cosechado Seguro'
+                    ? 'bg-blue-50/50 border-blue-200 hover:border-blue-300'
                     : 'bg-green-50/50 border-green-200 hover:border-green-300'}
                 `}
               >

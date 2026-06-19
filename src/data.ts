@@ -11,17 +11,19 @@ export const TRABAJADORES = [
   "Giovanna Luz Céspedes Tafur", "Hugo César Ibáñez Palomino", "Natalia Esperanza Vega Yana"
 ];
 
+export type EstadoLote = 'En Carencia Activa' | 'Listo para Cosecha' | 'Cosechado Seguro';
+
 export const LOTES = [
-  { nombre: "Lote A1", cultivo: "Arándano", hectareas: 12.5, carencia: 11 },
-  { nombre: "Lote A2", cultivo: "Arándano", hectareas: 10.2, carencia: 9 },
-  { nombre: "Lote A3", cultivo: "Arándano", hectareas: 14.0, carencia: 0 },
-  { nombre: "Lote B1", cultivo: "Uva", hectareas: 18.5, carencia: 16 },
-  { nombre: "Lote B2", cultivo: "Uva", hectareas: 15.0, carencia: 0 },
-  { nombre: "Lote B3", cultivo: "Uva", hectareas: 20.1, carencia: 0 },
-  { nombre: "Lote C1", cultivo: "Palta", hectareas: 8.4, carencia: 5 },
-  { nombre: "Lote C2", cultivo: "Palta", hectareas: 9.6, carencia: 0 },
-  { nombre: "Lote C3", cultivo: "Palta", hectareas: 11.2, carencia: 10 },
-  { nombre: "Lote C4", cultivo: "Palta", hectareas: 10.5, carencia: 0 }
+  { nombre: "Lote A1", cultivo: "Arándano", hectareas: 12.5, carencia: 11, estado: "En Carencia Activa" as EstadoLote },
+  { nombre: "Lote A2", cultivo: "Arándano", hectareas: 10.2, carencia: 9, estado: "En Carencia Activa" as EstadoLote },
+  { nombre: "Lote A3", cultivo: "Arándano", hectareas: 14.0, carencia: 0, estado: "Listo para Cosecha" as EstadoLote },
+  { nombre: "Lote B1", cultivo: "Uva", hectareas: 18.5, carencia: 16, estado: "En Carencia Activa" as EstadoLote },
+  { nombre: "Lote B2", cultivo: "Uva", hectareas: 15.0, carencia: 0, estado: "Cosechado Seguro" as EstadoLote },
+  { nombre: "Lote B3", cultivo: "Uva", hectareas: 20.1, carencia: 0, estado: "Listo para Cosecha" as EstadoLote },
+  { nombre: "Lote C1", cultivo: "Palta", hectareas: 8.4, carencia: 5, estado: "En Carencia Activa" as EstadoLote },
+  { nombre: "Lote C2", cultivo: "Palta", hectareas: 9.6, carencia: 0, estado: "Listo para Cosecha" as EstadoLote },
+  { nombre: "Lote C3", cultivo: "Palta", hectareas: 11.2, carencia: 10, estado: "En Carencia Activa" as EstadoLote },
+  { nombre: "Lote C4", cultivo: "Palta", hectareas: 10.5, carencia: 0, estado: "Listo para Cosecha" as EstadoLote }
 ];
 
 export type Lote = typeof LOTES[0];

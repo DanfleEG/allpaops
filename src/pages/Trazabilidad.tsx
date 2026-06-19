@@ -139,10 +139,14 @@ export function Trazabilidad() {
                   {LOTES.map(lote => (
                     <div key={lote.nombre} className="flex justify-between items-center py-1">
                       <span className="text-gray-600">{lote.nombre} ({lote.cultivo})</span>
-                      {lote.carencia > 0 ? (
-                        <span className="text-orange-600 border border-orange-200 bg-orange-50 px-2 py-0.5 rounded text-xs">Carencia: {lote.carencia}d</span>
-                      ) : (
-                        <span className="text-green-600 border border-green-200 bg-green-50 px-2 py-0.5 rounded text-xs">Cosechado Seguro</span>
+                      {lote.estado === 'En Carencia Activa' && (
+                        <span className="text-red-600 border border-red-200 bg-red-50 px-2 py-0.5 rounded text-xs">Carencia: {lote.carencia}d</span>
+                      )}
+                      {lote.estado === 'Listo para Cosecha' && (
+                        <span className="text-green-600 border border-green-200 bg-green-50 px-2 py-0.5 rounded text-xs">Listo para Cosecha</span>
+                      )}
+                      {lote.estado === 'Cosechado Seguro' && (
+                        <span className="text-blue-600 border border-blue-200 bg-blue-50 px-2 py-0.5 rounded text-xs">Cosechado Seguro</span>
                       )}
                     </div>
                   ))}
