@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Lock } from 'lucide-react';
+import { Lock, UserPlus, X } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 
 const TRABAJADORES = [
@@ -51,6 +51,15 @@ export function Tareo({ setTotalJabasHoy }: any) {
   const [loadingRegistros, setLoadingRegistros] = useState(true);
   const [errorRegistros, setErrorRegistros] = useState('');
 
+  // Worker Modal States
+  const [showWorkerModal, setShowWorkerModal] = useState(false);
+  const [workerNombre, setWorkerNombre] = useState('');
+  const [workerDni, setWorkerDni] = useState('');
+  const [workerActivo, setWorkerActivo] = useState(true);
+  const [isSubmittingWorker, setIsSubmittingWorker] = useState(false);
+  const [workerError, setWorkerError] = useState('');
+  const [workerSuccess, setWorkerSuccess] = useState('');
+
   const carenciaDias = CARENCIA_POR_LOTE[lote];
   const isBlocked = carenciaDias !== null && actividad === 'Cosecha';
 
@@ -88,7 +97,7 @@ export function Tareo({ setTotalJabasHoy }: any) {
         setTrabajadorNombre(null);
         return;
       }
-      if (dni.length < 8) return; // Optional logic, or just let it search if it's less
+      if (dni.length < 8) return;
       
       setDniStatus('loading');
       const { data, error } = await supabase
@@ -109,7 +118,6 @@ export function Tareo({ setTotalJabasHoy }: any) {
       }
     };
     
-    // Debounce
     const timerId = setTimeout(() => {
       searchDNI();
     }, 500);
@@ -126,7 +134,6 @@ export function Tareo({ setTotalJabasHoy }: any) {
     try {
       const numCantidad = actividad === 'Cosecha' ? (parseInt(cantidad) || 0) : 0;
 
-      // 1. Fetch lote_id
       const { data: loteData, error: loteError } = await supabase
         .from('lotes')
         .select('id')
@@ -138,7 +145,6 @@ export function Tareo({ setTotalJabasHoy }: any) {
         throw new Error('No se encontró el lote en Supabase');
       }
 
-      // 2. Insert into tareo_registros
       const { error: insertError } = await supabase
         .from('tareo_registros')
         .insert({
@@ -159,7 +165,6 @@ export function Tareo({ setTotalJabasHoy }: any) {
         setTotalJabasHoy?.((prev: number) => prev + numCantidad);
       }
 
-      // Reset form
       setDni('');
       setLote(LOTES[0]);
       setActividad(ACTIVIDADES[0]);
@@ -172,10 +177,68 @@ export function Tareo({ setTotalJabasHoy }: any) {
     }
   };
 
+  const handleRegistrarTrabajador = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!workerNombre || !workerDni) return;
+    
+    setIsSubmittingWorker(true);
+    setWorkerError('');
+    setWorkerSuccess('');
+
+    try {
+      const payload = {
+        nombre: workerNombre,
+        dni: workerDni,
+        activo: workerActivo
+      };
+
+      const pSupabase = supabase.from('trabajadores').insert(payload);
+      const pWebhook = fetch('https://n8n.danflylab.space/webhook/3448068b-686d-4017-868e-35f3a6889c58', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      const [resSupabase, resWebhook] = await Promise.allSettled([pSupabase, pWebhook]);
+
+      if (resSupabase.status === 'rejected' || resSupabase.value.error) {
+        throw new Error(resSupabase.status === 'rejected' ? resSupabase.reason : resSupabase.value.error?.message);
+      }
+
+      if (resWebhook.status === 'rejected' || !resWebhook.value.ok) {
+        console.error('Webhook failed:', resWebhook.status === 'rejected' ? resWebhook.reason : resWebhook.value.statusText);
+      }
+
+      setWorkerSuccess('✓ Trabajador registrado correctamente');
+      setTimeout(() => {
+        setShowWorkerModal(false);
+        setWorkerNombre('');
+        setWorkerDni('');
+        setWorkerActivo(true);
+        setWorkerSuccess('');
+      }, 1500);
+
+    } catch (err: any) {
+      setWorkerError(err.message || 'Error al registrar trabajador');
+    } finally {
+      setIsSubmittingWorker(false);
+    }
+  };
+
   return (
     <div className="p-6 max-w-6xl mx-auto w-full space-y-6">
-      <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
-        <h3 className="font-bold text-gray-700 mb-6">Registrar Tareo</h3>
+      <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm relative">
+        <div className="flex justify-between items-center mb-6">
+          <h3 className="font-bold text-gray-700">Registrar Tareo</h3>
+          <button
+            onClick={() => setShowWorkerModal(true)}
+            className="flex items-center gap-2 text-sm font-medium text-[#10B981] bg-[#10B981]/10 hover:bg-[#10B981]/20 px-3 py-1.5 rounded-lg transition-colors border border-[#10B981]/20"
+          >
+            <UserPlus size={16} />
+            Registrar Nuevo Trabajador
+          </button>
+        </div>
+        
         <form className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
             <div>
@@ -319,7 +382,7 @@ export function Tareo({ setTotalJabasHoy }: any) {
               )}
               {errorRegistros && !loadingRegistros && (
                 <tr>
-                  <td colSpan={6} className="px-5 py-8 text-center text-red-500 font-medium">
+                   <td colSpan={6} className="px-5 py-8 text-center text-red-500 font-medium">
                     {errorRegistros}
                   </td>
                 </tr>
@@ -357,6 +420,94 @@ export function Tareo({ setTotalJabasHoy }: any) {
           </table>
         </div>
       </div>
+
+      {showWorkerModal && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-xl shadow-xl max-w-md w-full overflow-hidden border border-gray-100">
+            <div className="flex justify-between items-center p-5 border-b border-gray-100">
+              <h3 className="font-bold text-gray-800">Registrar Nuevo Trabajador</h3>
+              <button 
+                onClick={() => setShowWorkerModal(false)}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            
+            <form onSubmit={handleRegistrarTrabajador} className="p-5 space-y-5">
+              {workerSuccess ? (
+                <div className="bg-green-50 text-green-700 text-sm font-medium p-4 rounded-lg flex items-center justify-center text-center border border-green-200">
+                  {workerSuccess}
+                </div>
+              ) : (
+                <>
+                  <div>
+                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Nombre Completo</label>
+                    <input
+                      type="text"
+                      required
+                      value={workerNombre}
+                      onChange={(e) => setWorkerNombre(e.target.value)}
+                      className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#10B981]/50 focus:border-[#10B981] text-sm"
+                      placeholder="Ej: Juan Pérez"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">DNI</label>
+                    <input
+                      type="text"
+                      required
+                      value={workerDni}
+                      onChange={(e) => setWorkerDni(e.target.value.replace(/\D/g, ''))}
+                      maxLength={8}
+                      className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#10B981]/50 focus:border-[#10B981] text-sm"
+                      placeholder="Número de DNI (8 dígitos)"
+                    />
+                  </div>
+
+                  <div className="flexItems-center pt-2">
+                    <label className="flex items-center gap-3 cursor-pointer">
+                      <div className="relative">
+                        <input
+                          type="checkbox"
+                          className="sr-only"
+                          checked={workerActivo}
+                          onChange={(e) => setWorkerActivo(e.target.checked)}
+                        />
+                        <div className={`block w-10 h-6 rounded-full transition-colors ${workerActivo ? 'bg-[#10B981]' : 'bg-gray-300'}`}></div>
+                        <div className={`absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform ${workerActivo ? 'translate-x-4' : ''}`}></div>
+                      </div>
+                      <span className="text-sm font-medium text-gray-700">Estado Activo</span>
+                    </label>
+                  </div>
+
+                  {workerError && (
+                    <div className="bg-red-50 text-red-600 text-sm font-medium p-3 rounded-lg border border-red-100">
+                      ✗ {workerError}
+                    </div>
+                  )}
+
+                  <div className="pt-2">
+                    <button
+                      type="submit"
+                      disabled={isSubmittingWorker || !workerNombre || workerDni.length < 8}
+                      className={`w-full font-medium py-2.5 px-4 rounded-lg transition-colors text-sm ${
+                        isSubmittingWorker || !workerNombre || workerDni.length < 8
+                          ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                          : 'bg-[#10B981] hover:bg-[#059669] text-white shadow-sm'
+                      }`}
+                    >
+                      {isSubmittingWorker ? 'Registrando...' : 'Registrar Trabajador'}
+                    </button>
+                  </div>
+                </>
+              )}
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
+
