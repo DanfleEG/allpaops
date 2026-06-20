@@ -195,11 +195,11 @@ Todos los planes incluyen 7 días de prueba gratuita, sin tarjeta de crédito re
 
 ## 👤 Autor
 
-**Danilo Estrella** — Computational Statistics, UNALM
+**Danilo Estrella** — Estadística Informática
 
-- 🌐 Portafolio: [tu-portafolio.com](https://porfolio.danflylab.space/)
-- 💻 GitHub: [github.com/tu-usuario](https://github.com/DanfleEG)
-- 💼 LinkedIn: [linkedin.com/in/tu-usuario](https://www.linkedin.com/in/danilo-estrella-guerra-9b26a92a5/)
+- 🌐 Portafolio: [portfolio.danflylabs](https://porfolio.danflylab.space/)
+- 💻 GitHub: [DanfleEG](https://github.com/DanfleEG)
+- 💼 LinkedIn: [Danilo.Estrella.Guerra](https://www.linkedin.com/in/danilo-estrella-guerra-9b26a92a5/)
 
 ---
 
